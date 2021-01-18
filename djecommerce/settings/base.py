@@ -8,7 +8,7 @@ SECRET_KEY = config('SECRET_KEY_KEY')
 print('secret')
 print(SECRET_KEY)
 print("os")
-print(os.environ.get('SECRET_KEY_KEY))
+print(os.environ.get('SECRET_KEY_KEY'))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
