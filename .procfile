@@ -1,1 +1,1 @@
-web: gunicorn Snoosshop_new.wsgi
+web: gunicorn djecommerce.wsgi
