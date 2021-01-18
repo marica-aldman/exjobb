@@ -1,3 +1,4 @@
+import django_heroku
 from decouple import config
 import os
 
@@ -98,3 +99,6 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER_NAME')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASS')
 EMAIL_PORT = config('EMAIL_PORT_NR')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS_BOOL')
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
