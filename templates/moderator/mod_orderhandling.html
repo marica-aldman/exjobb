@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="moderator_orderhandling_container">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="border border-dark mb-3 p-2">
+        <form method="POST" class="w-100">
+            {% csrf_token %}
+            <input type="hidden" value="{{current_page}}" name="current_page">
+            <div class="d-flex justify-content-around">
+                <div>
+                    Referens: {{form.order_ref|as_crispy_field}}
+                </div>
+                <div>
+                    Orderid: {{form.order_id|as_crispy_field}}
+                </div>
+                <div>
+                    {% comment %} <button type="submit" name="search" class='btn btn-primary mt-3 mod_button_search' value="newSearch" style="padding:10px">Sök</button> {% endcomment %}
+                    <button type="submit" name="search" class='btn btn-primary mt-3 mod_button_search' value="newSearch">Sök</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- results or all orders -->
+    <div class="border border-dark mb-3">
+        <h3 class="p-2">Ordrar</h3>
+        <table class="table-striped table-hover mb-2 table_sizing_fullwidth">
+            <thead class="mdb-color lighten-5">
+                {% comment %} <tr class="mod_orders_tr" style="text-align: center;"> {% endcomment %}
+                <tr>
+                    <th>
+                        Order ID
+                    </th>
+                    <th>
+                        Order Ref
+                    </th>
+                    <th>
+                        Titta på ordern
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for order in orders %}
+                {% comment %} <tr class="mod_orders_tr" style="text-align: center;"> {% endcomment %}
+                <tr>
+                    <td>
+                        {{ order.id }}
+                    </td>
+                    <td>
+                        {{ order.ref_code }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ order.get_absolute_url_moderator }}">
+                            {% csrf_token %}
+                            <button type="submit" value="{{order.id}}" name="lookAtOrder" class='btn btn-primary see_button'>
+                                Se order
+                            </button>
+                        </form>
+                    </td>
+                    {% if order.being_read %}
+                    <td>
+                        <button name="packing" class='btn btn-warning'>
+                            Packas
+                        </button>
+                    </td>
+                    {% else %}
+                    <td>
+                        &nbsp;
+                    </td>
+                    {% endif %}
+
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex w-100 justify-content-around">
+        <ul class="pagination">
+            {% if previous_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="True" name="previousPage" class="page-link">
+                        &laquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if start %}
+            <li>
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras">
+                        1
+                    </button>
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if current_page == 4 %}
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4" style="color: black; border: 0"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4">
+                        1
+                    </button>
+                </form>
+            {% endif %}
+            {% for o in more_orders %}
+            {%if current_page == o %}
+            <li class="page-item active">
+            {% else %}
+            <li class="page-item">
+            {% endif %}
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="{{ o }}" name="page" {% if current_page == o %}class="page-link disabled" disabled{% else %} class="page-link"{% endif %}>
+                        {{o}}<span class="sr-only">(current)</span>
+                    </button>
+                </form>
+            </li>
+            {% endfor %}
+            {% if end %}
+            <li>
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                    {% comment %} <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras">
+                        {{max}}
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if next_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:orderhandling' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="True" name="nextPage" class="page-link" {% if max == current_page %} disabled{% endif %}>
+                    &raquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,12 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Verify Your E-mail Address" %}</h1>
+
+    <p>{% blocktrans %}Vi har skickat ett email till dig för verifikation. Följ länken för att fullfölja processen att skapa konto. Om du inte fått länken inom några minuter, vargod kontakta oss.{% endblocktrans %}</p>
+
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div>
+        <a href="{% url 'moderator:faqs' %}">
+            <button type="submit" class="btn btn-primary back_button">
+                Tillbaka till faqs
+            </button>
+        </a>
+    </div>
+
+    <div class="border border-dark mb-3 p-2">
+        {% for title in theTitle %}
+            <h3>{{title.text}}</h3>
+        {% endfor %}
+        {% comment %} <form method="POST" action="." class="mod_faq_form" style="max-width: 100%"> {% endcomment %}
+        <form method="POST" action="." class="mod_faq_form">
+            {% csrf_token %}
+            {% comment %} <table class="table-striped table-hover mb-2 table-bordered" style="max-width: 100%"> {% endcomment %}
+            {% comment %} <table class="table-striped table-hover mb-2 table-bordered mod_faq_form_table" style="max-width: 100%">
+                <tbody style="max-width: 100%">
+                    <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+            <table class="table-striped table-hover mb-2 table-bordered mod_faq_form_table">
+                <tbody>
+                    <tr>
+                        <td>
+                            {{form.description.label}}
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td>
+                            {{ form.description }}
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td>
+                            Fråga
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td class="description2">
+                            {{ form.subject }}
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td>
+                            Svar
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td class="description2">
+                            {{ form.content }}
+                        </td>
+                    </tr>
+                    {% comment %} <tr style="max-width: 100%">
+                        <td style="max-width: 100%"> {% endcomment %}
+                    <tr>
+                        <td>
+                            
+                            {% for button in saveButton %}
+                            <button type='submit' class='btn btn-primary' id="save" name="saveFAQ">{{button.buttonText}}</button>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+
+{% endblock content %}

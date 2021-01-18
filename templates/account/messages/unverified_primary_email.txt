@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}Din huvudsakliga email måste verifieras.{% endblocktrans %}

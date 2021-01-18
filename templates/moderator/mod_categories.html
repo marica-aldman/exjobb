@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+
+    <div class="border border-dark mb-3 p-2">
+        <form method="POST" class="w-100">
+            <input type="hidden" value="{{current_page}}" name="current_page">
+        {% csrf_token %}
+            <div class="d-flex justify-content-around">
+                <div>
+                    Kategori id: {{form.category_id|as_crispy_field}}
+                </div>
+                <div>
+                    <button type="submit" name="search" class='btn btn-primary mt-3' value="newSearch">Sök</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="border border-dark mb-3 p-2">
+        <form method="POST" class="w-100" action="{% url 'moderator:new_category' %}">
+            {% csrf_token %}
+            <div class="d-flex justify-content-around">
+                <div>
+                    <button type="submit" value="{{product.id}}" name="new" class='btn btn-primary'>
+                        Skapa Ny Kategori
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- results or all orders -->
+    <div class="border border-dark mb-3 p-2">
+        <h3>Kategorier</h3>
+        <table class="table-striped table-hover w-100  mb-2 table-bordered">
+            <thead class="mdb-color lighten-5">
+                <tr>
+                    <th>
+                        Kategori id
+                    </th>
+                    <th>
+                        Titel
+                    </th>
+                    <th>
+                        Rea Pris
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+    {% if multiple %}
+        {% for category in categories %}
+                <tr>
+                    <td>
+                        {{ category.id }}
+                    </td>
+                    <td>
+                        {{ category.title }}
+                    </td>
+                    <td>
+                        {{ category.discount_price }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'moderator:category' %}">
+                            {% csrf_token %}
+                            {% comment %} <button type="submit" value="{{category.id}}" name="lookAtCategory" class='btn btn-primary mod_button_see' style="padding: 5px"> {% endcomment %}
+                            <button type="submit" value="{{category.id}}" name="lookAtCategory" class='btn btn-primary mod_button_see'>
+                                Se
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="." onSubmit="return confirm('{{onsubmit}}');">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete" value='yes'>
+                            <input type="hidden" name="id" value={{category.id}}>
+                            {% comment %} <button type="submit" class="btn btn-primary float-right mod_button_remove" style="padding: 5px"> {% endcomment %}
+                            <button type="submit" class="btn btn-primary float-right mod_button_remove">
+                                Ta bort
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+        {% endfor %}
+    {% else %}
+                <tr>
+                    <td>
+                        {{ category.id }}
+                    </td>
+                    <td>
+                        {{ category.title }}
+                    </td>
+                    <td>
+                        {{ category.price }}
+                    </td>
+                    <td>
+                        {{ category.category }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'moderator:category' %}">
+                            {% csrf_token %}
+                            <button type="submit" value="{{category.id}}" name="lookAtCategory" class='btn btn-primary'>
+                                Se
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="." onSubmit="return confirm('Are you sure you wish to delete the product? This action can not be undone and any products in this category will have the category removed from them.');">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete" value='yes'>
+                            <input type="hidden" name="id" value={{product.id}}>
+                            <button type="submit" class="btn btn-primary float-right">
+                                Ta bort
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+    {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex w-100 justify-content-around">
+        <ul class="pagination">
+            {% if previous_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="True" name="previousPage" class="page-link">
+                        &laquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if start %}
+            <li>
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras">
+                        1
+                    </button>
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if current_page == 4 %}
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4" style="color: black; border: 0"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4">
+                        1
+                    </button>
+                </form>
+            {% endif %}
+            {% for c in more_categories %}
+            {%if current_page == c %}
+            <li class="page-item active">
+            {% else %}
+            <li class="page-item">
+            {% endif %}
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="{{ c }}" name="page" {% if current_page == c %}class="page-link disabled" disabled{% else %} class="page-link"{% endif %}>
+                        {{c}}<span class="sr-only">(current)</span>
+                    </button>
+                </form>
+            </li>
+            {% endfor %}
+            {% if end %}
+            <li>
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                    {% comment %} <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras">
+                        {{max}}
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if next_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:categories' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_value}}">
+                    <button type="submit" value="True" name="nextPage" class="page-link" {% if max == current_page %} disabled{% endif %}>
+                    &raquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+</div>
+
+
+{% endblock content %}

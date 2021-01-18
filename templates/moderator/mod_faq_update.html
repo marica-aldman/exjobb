@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div>
+        <a href="{% url 'moderator:faqs' %}">
+            <button type="submit" class="btn btn-primary back_button">
+                Tillbaka till faqs
+            </button>
+        </a>
+    </div>
+
+    <div class="border border-dark mb-3 p-2">
+        <h3>{{Title}}</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <table class="table-striped table-hover w-100  mb-2 table-bordered">
+                <tbody>
+                    <tr>
+                        <td>
+                            {{form.description.label}}
+                            {{form.check}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.description }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{form.LanguageSubjectTitle.label}}
+                        </td>
+                    </tr>
+                    <tr>
+                        {% comment %} <td class="mod_faq_update_subject" style="width: 100%"> {% endcomment %}
+                        <td class="mod_faq_update_subject">
+                            {{ form.subject }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{form.LanguageContentTitle.label}}
+                        </td>
+                    </tr>
+                    <tr>
+                        {% comment %} <td class="mod_faq_update_content" style="width: 100%"> {% endcomment %}
+                        <td class="mod_faq_update_content">
+                            {{ form.content }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type='submit' class='btn btn-primary' name="saveFAQ" value="True">Spara</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<main>
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="container">
+        <div class="back_button">
+            <form method="POST" action="{% url 'support:specific_user' %}">
+                {% csrf_token %}
+                <button type="submit" class='btn btn-primary' name="lookAt" value="{{person.id}}">
+                    Tillbaka
+                </button>
+            </form>
+        </div>
+        <div class="mb-3">
+            {% if info.company %}
+            <h3>Ändra Kundens Kontaktpersonsinformation</h3>
+            {% else %}
+            <h3>Ändra Kundens profil</h3>
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" value="{{person.id}}" name="theUser">
+
+                <table class="table-striped table-hover w-100  mb-2">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Förnamn:
+                            </td>
+                            <td>
+                                {{ form.first_name|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Efternamn:
+                            </td>
+                            <td>
+                                {{ form.last_name|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Email:
+                            </td>
+                            <td>
+                                {{ form.email|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Telefonnummer:
+                            </td>
+                            <td>
+                                {{ form.telephone|as_crispy_field }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type='submit' class='btn btn-primary' name="saveProfile">Spara</button>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+{% endblock content %}

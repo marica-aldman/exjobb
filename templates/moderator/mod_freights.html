@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+
+    <div class="border border-dark mb-3 p-2">
+        <form method="POST" class="w-100">
+            <input type="hidden" value="{{current_page}}" name="current_page">
+            <input type="hidden" name="search" value="{{search_type}}">
+        {% csrf_token %}
+        {% if warning %}
+            <div class="d-flex justify-content-around">
+                Varning: Frakt ej funnen i vald typ
+            </div>
+        {% endif %}
+        <div class="d-flex justify-content-around flex-wrap">
+            <div class="d-flex align-self-center">
+                <div>
+                {{form.freight_type.label}} {{form.freight_type}}
+                </div>
+            </div>
+            <div class="d-flex align-self-center">
+                <div>
+                Id: {{form.freight_id}}
+                </div>
+            </div>
+            <div>
+                <button type="submit" name="newSearch" class='btn btn-primary mt-3'>Sök</button>
+            </div>
+        </form>
+            <div>
+                <form method="POST" class="w-100">
+                    {% csrf_token %}
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <button type="submit" name="resetFreightSearch" class='btn btn-primary mt-3' value="Yes">Tillbaka till alla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="border border-dark mb-3 p-2">
+        <form method="POST" class="w-100" action="{{freight.get_absolute_url_moderator_new}}">
+            {% csrf_token %}
+            <div class="d-flex justify-content-around">
+                <div>
+                    <button type="submit" value="new" name="new" class='btn btn-primary'>
+                        Skapa Nytt Fraktalternativ
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- results or all orders -->
+    <div class="border border-dark mb-3 p-2">
+        {% if search_done %}
+        <h3>Fraktalternativ</h3>
+        
+            <h4>Sök: {{search_value }} </h4>
+        {% else %}
+        <h3>Fraktalternativ</h3>
+        {% endif %}
+        <table class="table-striped table-hover w-100  mb-2 table-bordered">
+            <thead class="mdb-color lighten-5">
+                <tr>
+                    <th>
+                        Frakt id
+                    </th>
+                    <th>
+                        Titel
+                    </th>
+                    <th>
+                        Pris
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for a_freight in freights %}
+                <tr>
+                    <td>
+                        {{ a_freight.id }}
+                    </td>
+                    <td>
+                        {{ a_freight.title }}
+                    </td>
+                    <td>
+                        {{ a_freight.amount }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{a_freight.get_absolute_url_moderator}}">
+                            {% csrf_token %}
+                            <input type="hidden" name="freight_type" value="current">
+                            {% comment %} <button type="submit" value="{{a_freight.id}}" name="see" class='btn btn-primary mod_button_see' style="padding: 5px"> {% endcomment %}
+                            <button type="submit" value="{{a_freight.id}}" name="see" class='btn btn-primary mod_button_see'>
+                                Se
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        {% comment %} <div class="btn btn-success float-right mod_button_active" style="padding: 5px"> {% endcomment %}
+                        <div class="btn btn-success float-right mod_button_active">
+                            Aktiv
+                        </div>
+                    </td>
+                </tr>
+        {% endfor %}
+        {% for o_freight in oldfreights %}
+                <tr>
+                    <td>
+                        {{ o_freight.id }}
+                    </td>
+                    <td>
+                        {{ o_freight.title }}
+                    </td>
+                    <td>
+                        {{ o_freight.amount }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{o_freight.get_absolute_url_moderator}}">
+                            {% csrf_token %}
+                            <input type="hidden" name="freight_type" value="old">
+                            <button type="submit" value="{{o_freight.id}}" name="see" class='btn btn-primary'>
+                                Se
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <div class="btn btn-warning float-right">
+                            Ej aktiv
+                        </div>
+                    </td>
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex w-100 justify-content-around">
+        <ul class="pagination">
+            {% if previous_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    <button type="submit" value="True" name="previousPage" class="page-link">
+                        &laquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if start %}
+            <li>
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras">
+                        1
+                    </button>
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if current_page == 4 %}
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4" style="color: black; border: 0"> {% endcomment %}
+                    <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4">
+                        1
+                    </button>
+                </form>
+            {% endif %}
+            {% for the_freight in more_freights %}
+            {%if current_page == the_freight %}
+            <li class="page-item active">
+            {% else %}
+            <li class="page-item">
+            {% endif %}
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    <button type="submit" value="{{ the_freight }}" name="page" {% if current_page == the_freight %}class="page-link disabled" disabled{% else %} class="page-link"{% endif %}>
+                        {{the_freight}}<span class="sr-only">(current)</span>
+                    </button>
+                </form>
+            </li>
+            {% endfor %}
+            {% if end %}
+            <li>
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                    <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                        ...
+                    </button>
+                    {% comment %} <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                    <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras">
+                        {{max}}
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+            {% if next_page %}
+            <li class="page-item">
+                <form method="POST" action="{% url 'moderator:freights' %}">
+                {% csrf_token %}
+                    <input type="hidden" value="pagination" name="paging">
+                    <input type="hidden" value="{{current_page}}" name="current_page">
+                    <input type="hidden" name="search" value="{{search_type}}">
+                    <input type="hidden" name="search_value" value="{{search_value}}">
+                    <button type="submit" value="True" name="nextPage" class="page-link" {% if max == current_page %} disabled{% endif %}>
+                    &raquo;
+                    </button>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<main>
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="container">
+<!-- specific orders -->
+        <div>
+            <a href="{% url 'member:my_orders' %}">
+                <button type="submit" class="btn btn-primary float-right">
+                    Tillbaka till alla ordrar
+                </button>
+            </a>
+        </div>
+        <div class="border rounded mb-3">
+            <table class="table-striped table-hover w-100  mb-2">
+                <tbody>
+                    <tr>
+                        <td>
+                            Order Referens
+                        </td>
+                        <td>
+                            {{ order.ref_code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Beställd
+                        </td>
+                        <td>
+                            {{ order.ordered_date }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Faktureringsadress
+                        </td>
+                        <td>
+                            {{ shipping_address.street_address }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Leveransadress
+                        </td>
+                        <td>
+                            {{ billing_address.street_address }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Totalkostnad av produkter
+                        </td>
+                        <td>
+                            ${{ order.get_total_basket }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Frakttyp
+                        </td>
+                        <td>
+                            {{ order.freight.title }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Fraktkostnad
+                        </td>
+                        <td>
+                            {{ order.freight.amount }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Använda rabattkoder
+                        </td>
+                        <td>
+                            {% if noCoupons %}
+                            Inga
+                            {% else %}
+                            {{ coupons.code }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Totalkostnad
+                        </td>
+                        <td>
+                            {{ order.total_price }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Status
+                        </td>
+                        <td>
+                            {% if order.being_delivered %}
+                                Skickad
+                            {% elif order.recieved %}
+                                Mottagen
+                            {% else %}
+                                Underbehandling
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if refund.requested %}
+                    <tr>
+                        <td>
+                            Returstatus
+                        </td>
+                        <td>
+                            {% if order.refund_requested %}
+                                {% if order.refund_granted %}
+                                    Återbetalning godkänd
+                                {% else %}
+                                    Retur begärd
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="border rounded mb-3">
+            <table class="table-striped table-hover w-100  mb-2">
+                <thead>
+                    <tr class="mdb-color lighten-5">
+                        <th>
+                            Produkt
+                        </th>
+                        <th>
+                            Mängd
+                        </th>
+                        <th>
+                            Kostnad per stock
+                        </th>
+                        <th>
+                            Totalkostnad per produkt
+                        </th>
+                    </tr>
+                </thead>
+                <tbody> <!-- available variables, all_order_items, all_items, discounts, coupon, payment -->
+                {% for orderItem in all_order_items %}
+                    <tr>
+                        <td>
+                            {{orderItem.item.title}}
+                        </td>
+                        <td>
+                            {{orderItem.quantity}}
+                        </td>
+                        <td>
+                            {{orderItem.price}}
+                        </td>
+                        <td>
+                            {{orderItem.total_price}}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</main>
+{% endblock content %}

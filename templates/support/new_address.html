@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<main>
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="container">
+        <form method="POST" action="{% url 'support:edit_addresses' %}">
+            {% csrf_token %}
+            <button type="submit" class='btn btn-primary' name="back" value="{{person.id}}">
+                Tillbaka
+            </button>
+        </form>
+        <div class="border rounded mb-3">
+            <h3>Kundens adress</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="theUser" value="{{ person.id }}">
+                <table>
+                    <tbody>
+                        {% comment %} <tr class="mod_customer_street" style="height:56px;"> {% endcomment %}
+                        <tr class="mod_customer_street">
+                            <td>
+                                Gatuadress:
+                            </td>
+                            <td>
+                                {{ form.street_address }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Lägenhetsnummer:
+                            </td>
+                            <td>
+                                {{ form.apartment_address }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Postadress:
+                            </td>
+                            <td>
+                                {{ form.post_town }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Postkod:
+                            </td>
+                            <td>
+                                {{ form.zip }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Addresstyp:
+                            </td>
+                            <td>
+                                <select name="address_type" class="select form-control">
+                                    {% for choice_list in address_choices %}
+                                        <option value={{choice_list.choice}} {% if choice_list.chosen %}selected{% endif %}>{{choice_list.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Huvudsaklig address:
+                            </td>
+                            <td>
+                                <input type="checkbox" {% if address.default%} checked{% endif%} name="default_address">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type='submit' class='btn btn-primary' name="saveAddress" value="True">Spara</button>
+            </form>
+        </div>
+
+    </div>
+
+</main>
+{% endblock content %}

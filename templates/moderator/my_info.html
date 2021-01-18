@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<!-- all subscriptions-->
+<main>
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="container">
+        <div>
+            <a href="{% url 'moderator:my_profile' %}">
+                <button type="submit" class="btn btn-primary back_button">
+                    Tillbaka till profil
+                </button>
+            </a>
+        </div>
+        <div class="border rounded mb-3">
+            <h3>Ändra min information</h3>
+            <form method="POST">
+                {% csrf_token %}
+
+                <table class="table-striped table-hover w-100  mb-2">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Förnamn:
+                            </td>
+                            <td>
+                                {{ form.first_name|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Efternamn:
+                            </td>
+                            <td>
+                                {{ form.last_name|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Email:
+                            </td>
+                            <td>
+                                {{ form.email|as_crispy_field }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Telefonnummer:
+                            </td>
+                            <td>
+                                {{ form.telephone|as_crispy_field }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type='submit' class='btn btn-primary'>Spara</button>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+{% endblock content %}

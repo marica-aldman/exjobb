@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div>
+        <a href="{% url 'moderator:freights' %}">
+            <button type="submit" class="btn btn-primary back_button">
+                Tillbaka till frakter
+            </button>
+        </a>
+    </div>
+
+    <div class="border border-dark mb-3 p-2">
+        <h3>Frakt</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <table class="table-striped table-hover w-100  mb-2 table-bordered">
+                <tbody>
+                    <tr>
+                        <td>
+                            Titel:
+                        </td>
+                        <td>
+                            {{ form.title }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Pris
+                        <td>
+                            {{ form.amount }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Beskrivning
+                        <td class="description">
+                            {{ form.description }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type='submit' class='btn btn-primary' {% if new %}name="saveNew" value="new"
+            {% else %}name="saveOld" value="old"{% endif %} {% if old %}disabled{% endif%}>Spara</button>
+            {% if new %}
+            <!-- new freight -->
+            {% else %}
+            <input type="hidden" name="freight" value="{{freight}}">
+            {% endif %}
+            {% if old %} 
+                <input type="hidden" name="inactive" value="yes">
+                <button type='submit' class='btn btn-primary'  name="reactivate" value="yes">Återaktivera</button>
+            {% else %}
+                <input type="hidden" name="inactive" value="yes">
+                {% if new %}
+                {% else %}
+                <button type='submit' class='btn btn-primary'  name="reactivate" value="no">Avaktivera</button>
+                {% endif %}
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+
+{% endblock content %}

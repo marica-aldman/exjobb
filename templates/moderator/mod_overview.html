@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="row">
+        
+        <div class="col m-2">
+
+    <!--recently completed-->
+            <div class=" border border-dark mb-3 p-2">
+                <h3>Icke skickade ordrar</h3>
+                <table class="table-striped table-hover table_sizing_fullwidth_3  mb-2">
+                    <thead class="mdb-color lighten-5">
+                        <tr>
+                            <th>
+                                Order Ref
+                            </th>
+                            <th>
+                                Beställd
+                            </th>
+                            <th>
+                                Titta på ordern
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+          {% for order in orders %}
+                        <tr>
+                            <td>
+                                {{ order.ref_code }}
+                            </td>
+                            <td>
+                                {{ order.ordered_date }}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{order.get_absolute_url_moderator}}">
+                                    {% csrf_token %}
+                                    {% comment %} <button type="submit" value="{{order.id}}" name="lookAtOrder" class='btn btn-primary mod_button_see' style="padding: 5px"> {% endcomment %}
+                                    <button type="submit" value="{{order.id}}" name="lookAtOrder" class='btn btn-primary mod_button_see'>
+                                        Se order
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+          {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex w-100 justify-content-around">
+                <ul class="pagination">
+                    {% if previous_page %}
+                    <li class="page-item">
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            <button type="submit" value="True" name="previousPage" class="page-link">
+                                &laquo;
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                    {% if start %}
+                    <li>
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                            <button type="submit" value="1" name="page" class="page-link mod_button_paging_extras">
+                                1
+                            </button>
+                            {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                            <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                                ...
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                    {% if current_page == 4 %}
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            {% comment %} <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4" style="color: black; border: 0"> {% endcomment %}
+                            <button type="submit" value="1" name="page" class="page-link mod_button_paging_if_4">
+                                1
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% for order in more_orders %}
+                    {%if current_page == order %}
+                    <li class="page-item active">
+                    {% else %}
+                    <li class="page-item">
+                    {% endif %}
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            <button type="submit" value="{{ order }}" name="page" {% if current_page == order %}class="page-link disabled" disabled{% else %} class="page-link"{% endif %}>
+                                {{order}}<span class="sr-only">(current)</span>
+                            </button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                    {% if end %}
+                    <li>
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            {% comment %} <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block" disabled> {% endcomment %}
+                            <button type="submit" value="False" name="..." class="page-link mod_button_paging_extras" disabled>
+                                ...
+                            </button>
+                            {% comment %} <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras" style="color: black; border: 0; display:inline-block"> {% endcomment %}
+                            <button type="submit" value="{{max}}" name="page" class="page-link mod_button_paging_extras">
+                                {{max}}
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                    {% if next_page %}
+                    <li class="page-item">
+                        <form method="POST" action="{% url 'moderator:overview' %}">
+                        {% csrf_token %}
+                            <input type="hidden" value="pagination" name="paging">
+                            <input type="hidden" value="{{current_page}}" name="current_page">
+                            <button type="submit" value="True" name="nextPage" class="page-link" {% if max == current_page %} disabled{% endif %}>
+                            &raquo;
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main>
+
+    {% if gdpr_check %}
+      {% include "gdpr_popup.html" %}
+    {% endif %}
+    <div class="container">
+    <div>
+        <form method="POST" action="{% url 'support:specific_user' %}">
+            {% csrf_token %}
+            <div>
+                <div>
+                    <button type="submit" class='btn btn-primary' name="lookAt" value="{{person.id}}">
+                        Tillbaka
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--orders-->
+    <!--active-->
+        <div class="border rounded mb-3">
+            <h3>Inställningar för kundens kakor</h3>
+            <form method="POST" action=".">
+                <table class="table-striped table-hover w-100">
+                    <thead class="mdb-color lighten-5">
+                        <tr>
+                            <th>
+                                Typ
+                            </th>
+                            <th>
+                                Inställning
+                            </th>
+                            <th>
+                                Ändra
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Sidfunktion
+                            </td>
+                            <td>
+                                På
+                            </td>
+                            <td>
+                                Dessa går inte att stänga av då sidans grundläggande funktioner så som navigation, kundvagn etc slutar fungera.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+               {% comment %} <div class="w-100 mb-2 save_settings_button" style="height: 50px!important;"> {% endcomment %}
+               <div class="w-100 mb-2 save_settings_button">
+                    <button type="submit"class="btn btn-primary float-right" disabled>
+                        Spara kakinställningar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</main>
+{% endblock content %}
