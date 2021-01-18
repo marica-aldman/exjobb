@@ -1,6 +1,8 @@
 from .base import *
+from decouple import config
+import os
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1']
 
 INSTALLED_APPS += [
