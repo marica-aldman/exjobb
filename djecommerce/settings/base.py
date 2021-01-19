@@ -2,7 +2,7 @@ import django_heroku
 from decouple import config
 import os
 
-SECRET_KEY = os.environ.get('SECRET_KEY_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))

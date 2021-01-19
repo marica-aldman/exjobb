@@ -2,10 +2,10 @@ from .base import *
 from decouple import config
 import os
 
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = False
 ALLOWED_HOSTS = ['84.216.113.116']
 #SECRET_KEY = config('SECRET_KEY_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
