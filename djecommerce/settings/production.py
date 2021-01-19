@@ -4,7 +4,8 @@ import os
 
 DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = ['84.216.113.116']
-SECRET_KEY = config('SECRET_KEY_KEY')
+#SECRET_KEY = config('SECRET_KEY_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY_KEY')
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -27,3 +28,7 @@ DATABASES = {
 STRIPE_PUBLIC_KEY = config('STRIPE_LIVE_PUBLIC_KEY_VAR')
 STRIPE_SECRET_KEY = config('STRIPE_LIVE_SECRET_KEY_VAR')
 STRIPE_ENDPOINT_SECRET = config('STRIPE_ENDPOINT_SECRET_KEY')
+
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
