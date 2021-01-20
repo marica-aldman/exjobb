@@ -1,6 +1,5 @@
 from django import forms
 from datetime import datetime
-from django_countries.widgets import CountrySelectWidget
 from django.core.exceptions import ObjectDoesNotExist
 from core.models import *
 
@@ -317,7 +316,6 @@ class NewAddressForm(forms.Form):
         self.fields['apartment_address'].label = ""
         self.fields['post_town'].label = ""
         self.fields['zip'].label = ""
-        self.fields['country'].label = ""
         self.fields['address_type'].label = ""
 
 
@@ -336,7 +334,6 @@ class SetupAddressForm(forms.Form):
         self.fields['apartment_address'].label = ""
         self.fields['post_town'].label = ""
         self.fields['zip'].label = ""
-        self.fields['country'].label = ""
         self.fields['address_type'].label = ""
 
     def populate(self, theCompany, *args, **kwargs):
@@ -349,8 +346,6 @@ class SetupAddressForm(forms.Form):
             {'value': address.post_town})
         self.fields['zip'].widget.attrs.update(
             {'value': address.zip})
-        self.fields['country'].widget.attrs.update(
-            {'value': address.country})
         self.fields['address_type'].widget.attrs.update(
             {'value': address.address_type})
 
@@ -367,8 +362,6 @@ class SetupAddressForm(forms.Form):
             {'value': address.post_town})
         self.fields['zip'].widget.attrs.update(
             {'value': address.zip})
-        self.fields['country'].widget.attrs.update(
-            {'value': address.country})
         self.fields['address_type'].widget.attrs.update(
             {'value': address.address_type})
 
