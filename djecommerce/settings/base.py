@@ -1,5 +1,4 @@
 import django_heroku
-from decouple import config
 import os
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
