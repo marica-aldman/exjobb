@@ -4,8 +4,8 @@ import os
 
 DEBUG = False
 ALLOWED_HOSTS = ['84.216.113.116']
-#SECRET_KEY = config('SECRET_KEY_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# SECRET_KEY = config('SECRET_KEY_KEY')
+SECRET_KEY = "kobl@t=yw9d*0y%jt2gjnq78=u!z_rrxb&w8e47l!(jz@m79zy"
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 
