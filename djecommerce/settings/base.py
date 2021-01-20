@@ -94,11 +94,11 @@ SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = config('EMAIL_HOST_URL')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER_NAME')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASS')
-EMAIL_PORT = config('EMAIL_PORT_NR')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS_BOOL')
+EMAIL_HOST = os.environ.get('EMAIL_HOST_URL')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER_NAME')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
+EMAIL_PORT = os.environ.get('EMAIL_PORT_NR')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS_BOOL')
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
