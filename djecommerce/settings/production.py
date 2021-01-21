@@ -1,7 +1,7 @@
 from .base import *
 import os
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['snoosshop.herokuapp.com']
 SECRET_KEY = os.environ.get('SECRET_KEY_KEY')
 # SECRET_KEY = "kobl@t=yw9d*0y%jt2gjnq78=u!z_rrxb&w8e47l!(jz@m79zy"
@@ -57,5 +57,6 @@ LOGGING = {
         }
     }
 }
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
