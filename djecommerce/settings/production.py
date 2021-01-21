@@ -2,7 +2,7 @@ from .base import *
 import os
 
 DEBUG = False
-ALLOWED_HOSTS = ['snoosshop.herokuapp.com']
+ALLOWED_HOSTS = ['.herokuapp.com']
 # SECRET_KEY = config('SECRET_KEY_KEY')
 SECRET_KEY = "kobl@t=yw9d*0y%jt2gjnq78=u!z_rrxb&w8e47l!(jz@m79zy"
 BASE_DIR = os.path.dirname(os.path.dirname(
