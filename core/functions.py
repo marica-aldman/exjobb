@@ -1,4 +1,3 @@
-#from slugify import slugify
 from django.template.defaultfilters import slugify
 from datetime import datetime, timedelta
 from core.models import *
