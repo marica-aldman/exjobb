@@ -17,7 +17,6 @@ from itertools import combinations
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm, SearchFAQForm
 from .models import *
 from core.functions import *
-import stripe
 from django.http.response import JsonResponse, HttpResponse
 
 import stripe
@@ -325,7 +324,6 @@ class CheckoutView(View):
                     return render(self.request, "checkout.html", context)
                 else:
                     if payment_option == 'S':
-                        # change this for stripe
                         return redirect('core:confirm')
                     else:
                         messages.warning(
@@ -334,162 +332,6 @@ class CheckoutView(View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "Varukorgen är tom.")
             return redirect("core:order-summary")
-
-
-class PaymentView(View):
-    def get(self, *args, **kwargs):
-        # GDPR check
-        gdpr_check = check_gdpr_cookies(self)
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        if order.billing_address:
-            context = {
-                'gdpr_check': gdpr_check,
-                'order': order,
-                'DISPLAY_COUPON_FORM': False
-            }
-            userprofile = self.request.user.userprofile
-            if userprofile.one_click_purchasing:
-                # fetch the users card list
-                cards = stripe.Customer.list_sources(
-                    userprofile.stripe_customer_id,
-                    limit=3,
-                    object='card'
-                )
-                card_list = cards['data']
-                if len(card_list) > 0:
-                    # update the context with the default card
-                    context.update({
-                        'card': card_list[0]
-                    })
-            return render(self.request, "payment.html", context)
-        else:
-            messages.warning(
-                self.request, "Du har inte laggt till någon faktureringsadress.")
-            return redirect("core:checkout")
-
-    def post(self, *args, **kwargs):
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        form = PaymentForm(self.request.POST)
-        userprofile = UserProfile.objects.get(user=self.request.user)
-        if form.is_valid():
-            token = form.cleaned_data.get('stripeToken')
-            save = form.cleaned_data.get('save')
-            use_default = form.cleaned_data.get('use_default')
-
-            if save:
-                if userprofile.stripe_customer_id != '' and userprofile.stripe_customer_id is not None:
-                    customer = stripe.Customer.retrieve(
-                        userprofile.stripe_customer_id)
-                    customer.sources.create(source=token)
-
-                else:
-                    customer = stripe.Customer.create(
-                        email=self.request.user.email,
-                    )
-                    customer.sources.create(source=token)
-                    userprofile.stripe_customer_id = customer['id']
-                    userprofile.one_click_purchasing = True
-                    userprofile.save()
-
-            amount = int(order.get_total() * 100)
-
-            try:
-
-                if use_default or save:
-                    # charge the customer because we cannot charge the token more than once
-                    charge = stripe.Charge.create(
-                        amount=amount,  # cents
-                        currency="usd",
-                        customer=userprofile.stripe_customer_id
-                    )
-                else:
-                    # charge once off on the token
-                    charge = stripe.Charge.create(
-                        amount=amount,  # cents
-                        currency="usd",
-                        source=token
-                    )
-
-                # create the payment
-                payment = Payment()
-                payment.stripe_charge_id = charge['id']
-                payment.user = self.request.user
-                payment.timestamp = make_aware(datetime.now())
-                payment.amount = order.get_total()
-                payment.save()
-
-                # assign the payment to the order
-
-                order_items = order.items.all()
-                for item in order_items:
-                    item.ordered = True
-                    item.save()
-
-                order.ordered = True
-                order.ordered_date = make_aware(datetime.now())
-                order.payment = payment
-
-                # create a reference code and check that there isnt already one before setting the orders ref code to the code
-                ref_code = create_ref_code()
-                ref_test = True
-
-                while ref_test:
-                    testOrder = Order.objects.filter(ref_code=ref_code)
-                    if testOrder is not None:
-                        refcode = create_ref_code()
-                    else:
-                        ref_test = False
-
-                order.ref_code = ref_code
-                order.save()
-
-                messages.success(self.request, "Din order är registrerad!")
-                return redirect("/")
-
-            except stripe.error.CardError as e:
-                body = e.json_body
-                err = body.get('error', {})
-                messages.warning(self.request, f"{err.get('message')}")
-                return redirect("/")
-
-            except stripe.error.RateLimitError as e:
-                # Too many requests made to the API too quickly
-                messages.warning(
-                    self.request, "För många API förfrågningar under kort tid")
-                return redirect("/")
-
-            except stripe.error.InvalidRequestError as e:
-                # Invalid parameters were supplied to Stripe's API
-                messages.warning(self.request, "Ogiltiga parametrar")
-                return redirect("/")
-
-            except stripe.error.AuthenticationError as e:
-                # Authentication with Stripe's API failed
-                # (maybe you changed API keys recently)
-                messages.warning(self.request, "Ej autentiserad")
-                return redirect("/")
-
-            except stripe.error.APIConnectionError as e:
-                # Network communication with Stripe failed
-                messages.warning(self.request, "Nätverksfel")
-                return redirect("/")
-
-            except stripe.error.StripeError as e:
-                # Display a very generic error to the user, and maybe send
-                # yourself an email
-                messages.warning(
-                    self.request, "Något gick fel. Betalningen gick inte igenom. Vargod försök igen.")
-                return redirect("/")
-
-            except Exception as e:
-                # send an email to ourselves
-                messages.warning(
-                    self.request, "Ett mycket allvarligt fel har inträffat.")
-                return redirect("/")
-
-        messages.warning(self.request, "Ogiltig data inkommen")
-        return redirect("/payment/stripe/")
-
 
 class NewHomeView(View):
     def get(self, *args, **kwargs):
@@ -1833,7 +1675,6 @@ def create_checkout_session(request):
 
 @csrf_exempt
 def stripe_webhook(request):
-    print("yes")
     stripe.api_key = settings.STRIPE_SECRET_KEY
     endpoint_secret = settings.STRIPE_ENDPOINT_SECRET
     payload = request.body

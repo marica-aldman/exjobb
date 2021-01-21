@@ -72,7 +72,7 @@ class Address(models.Model):
     apartment_address = models.CharField(max_length=100)
     post_town = models.CharField(max_length=100, null=True)
     zip = models.CharField(max_length=100)
-    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    address_type = models.CharField(max_length=3, choices=ADDRESS_CHOICES)
     default = models.BooleanField(default=False)
     slug = models.SlugField(default='address')
 
