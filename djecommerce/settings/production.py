@@ -55,6 +55,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         }
-
+    }
+}
 # Activate Django-Heroku.
 django_heroku.settings(locals())
