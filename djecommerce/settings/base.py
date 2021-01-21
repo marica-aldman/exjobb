@@ -70,7 +70,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_in_env')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_in_env')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static_in_env/img')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 
 # Auth
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
